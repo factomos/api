@@ -1,5 +1,5 @@
-API Factomos V1.21 - 07/07/2015
-==============================
+API Factomos V1.27 - 24/11/2015
+===============================
 
 # 1. Introduction
 
@@ -107,6 +107,7 @@ POST REQUEST
     - S.A.S.
     - S.A.S.U.
     - S.C.I.
+    - S.N.C.
     - S.E.L.A.R.L.
  - company_address, Adresse de la société (OPTIONNEL)
  - zipcode, Code postal de la société (OPTIONNEL)
@@ -127,13 +128,13 @@ On peut aussi rajouter les paramètres suivants pour créer un couple token/secr
  - app_name: le nom de l’appli
  - app_description: une courte description de l’appli.
  - app_icon: URL de l'icône de l'application (40px x 40px), optionnel
- - webhook_url: URL qui va être notifiée via un POST (cf # 7.) à chaque action faite dans Factomos
+ - webhook_url: URL qui va être notifiée via un POST (cf # 8.) à chaque action faite dans Factomos
 
 ## Paramètres en sortie
 
  - company_id, l'identifiant de la société,
  - password, si aucun mot de passe n'était présent dans la requête alors celui-ci sera présent avec une valeur générée aléatoirement
- - auth_token, Token d'authentification utilisable une fois (cf # 4.)
+ - auth_token, Token d'authentification utilisable une fois (cf # 5.)
 
 Si des paramètres API ont été rajoutés à la requête alors on aura les paramètres suivants dans la réponse:
 
@@ -245,7 +246,54 @@ JSON RESULT
 }
 ```
 
-# 4. Création de session sur Factomos.com via l'API (SSO)
+# 4. Mise à jour du statut d'un compte Factomos via l'API
+
+## Paramètres en entrée
+
+POST REQUEST
+ - action=updateAccount (OBLIGATOIRE)
+ - company_id, Identifiant du compte Factomos à supprimer (OBLIGATOIRE)
+ - subscription_status, Statut du compte (active, readonly, blocked) (OBLIGATOIRE)
+
+## Paramètres en sortie
+
+ - aucun
+
+## Code d'erreurs
+
+Code d'erreur | Message d'erreur                          | Description
+------------: | :---------------------------------------- | :----------------
+0             |                                           | Pas d'erreur, la requête s'est bien passée
+-1            | Missing Token                             | Le Champ "token" est manquant, or il est obligatoire
+-2            | Missing Crypted Request                   | Le Champ "crequest" est manquant, or il est obligatoire
+-3            | Invalid Token                             | Le Token est invalide, il n'existe pas dans la base Factomos
+-4            | Too many API calls for the day            | Vous avez dépassé le nombre maximum d'appels API pour la journée (par défaut limité à 500)
+-5            | Invalid Crypted Request                   | La requête n'a pas pu être décryptée, le champ crequest est invalide
+-6            | Action not found or invalid               | Le Champ "action" est manquant, or il est obligatoire
+-33           | Action not authorized                     | Cette action n'est autorisée que pour les partenaires Factomos (contactez-nous)
+-35           | Missing parameter company_id              | Le Champ "company_id" est manquant, or il est obligatoire
+-36           | Account not found                         | Le compte avec l'identifiant "company_id" n'existe pas dans la base
+-37           | Missing parameter subscription_status     | Le Champ "subscription_status" est manquant, or il est obligatoire
+-38           | Parameter subscription_status invalid     | Le Champ "subscription_status" est invalide, il doit être égal à une des valeurs suivantes : active, readonly, blocked
+
+## Exemple
+
+POST REQUEST
+ - action=updateAccount
+ - company_id=9999
+ - subscription_status=readonly
+
+JSON RESULT
+```json
+{
+    "error":{
+        "code":0,
+        "message":"OK"
+    }
+}
+```
+
+# 5. Création de session sur Factomos.com via l'API (SSO)
 
 ## Paramètres en entrée
 
@@ -313,7 +361,7 @@ JSON RESULT
 ```
 
 
-# 5. Contrôle de la session en cours (SSO)
+# 6. Contrôle de la session en cours (SSO)
 
 HTTP GET vers l'URL https://app.factomos.com/api/session/check
 
@@ -341,7 +389,7 @@ Code d'erreur | Message d'erreur                          | Description
 -34           | No session                                | Il n'y a pas de session en cours
 
 
-# 6. Obtenir le couple token, secret, via le formulaire d'autorisation d'Applications tierces
+# 7. Obtenir le couple token, secret, via le formulaire d'autorisation d'Applications tierces
 
 Il faut créer un bouton du genre = « Connecter avec Factomos » qui doit faire l’action suivante :
 
@@ -354,13 +402,13 @@ Les paramètres dans l’URL sont les suivants :
 - app_name: le nom de l’appli
 - app_description: une courte description de l’appli.
 - app_icon: URL de l'icône de l'application (40px x 40px), optionnel
-- webhook_url: URL qui va être notifiée via un POST (cf # 7.) à chaque action faite dans Factomos
+- webhook_url: URL qui va être notifiée via un POST (cf # 8.) à chaque action faite dans Factomos
 
 Ceci va ouvrir une popup d’authentification, si le login et le mot de passe sont corrects, alors FACTOMOS va faire un POST vers l’url de call_back en envoyant les paramètres api_key, et api_secret.
 Ensuite le popup est fermé
 
 
-# 7. Le webhook
+# 8. Le webhook
 
 A chaque action, un contenu JSON va être envoyé en RAW POST vers l'URL de webhook qui a été précisée lors de la connexion de l'appli tierce.
 
@@ -455,7 +503,7 @@ Voici un exemple de POST lors de la création d'un devis.
 ```
 
 
-# 8. Afficher un formulaire de création de devis (au sein de factomos.com) pré-rempli
+# 9. Afficher un formulaire de création de devis (au sein de factomos.com) pré-rempli
 
 Faire un POST vers la page https://app.factomos.com/creer-devis avec les paramètres suivants :
 
@@ -466,7 +514,7 @@ Faire un POST vers la page https://app.factomos.com/creer-devis avec les paramè
 - `estimate_comment` (Champ « commentaire » du devis)
 - `custom`, un champ pour y mettre vos variables, ce dernier sera renvoyé tel quel dans la notification au webhook
 
-# 9. Récupérer les infos d'un client à partir de son id
+# 10. Récupérer les infos d'un client à partir de son id
 
 ## Paramètres en entrée
  - action=getClient, (OBLIGATOIRE)
@@ -498,27 +546,27 @@ JSON RESULT
     "client": {
         "client_id":"5782",
         "company_id":"1",
-        "client_company_name":"name from API",
+        "client_company_name":"name",
         "client_business_category":"",
-        "client_reference":"reference from API",
-        "description":"description from API",
-        "client_address":"address from API",
-        "client_address_more":"address more from API",
-        "client_zipcode":"zipcode from API",
-        "client_city":"city from API",
-        "client_country":"country from API",
-        "number_tva":"tva from API",
-        "number_siret":"siret from API",
-        "client_website":"website from API",
-        "client_email":"email from API",
+        "client_reference":"reference",
+        "description":"description",
+        "client_address":"address",
+        "client_address_more":"address more",
+        "client_zipcode":"zipcode",
+        "client_city":"city",
+        "client_country":"country",
+        "number_tva":"tva",
+        "number_siret":"siret",
+        "client_website":"website",
+        "client_email":"email",
         "client_contact_firstname":"",
-        "client_contact_lastname":"contact from API",
-        "client_phonenumber":"phone from API",
+        "client_contact_lastname":"contact",
+        "client_phonenumber":"phone",
         "client_contact_title":"",
         "category":"client",
         "client_other":"",
         "client_lang":"en",
-        "client_keyword":"keyword from API",
+        "client_keyword":"keyword",
         "client_code_analytic":"9NAMEFRO"
     },
     "error":{
@@ -530,7 +578,7 @@ JSON RESULT
     
 
 
-# 10. Créer un client
+# 11. Créer un client
 
 ## Paramètres en entrée
 
@@ -576,22 +624,22 @@ Code d'erreur | Message d'erreur                          | Description
 POST REQUEST
 - action=createClient
 - category=client
-- client_company_name=name from API
-- client_reference=reference from API
+- client_company_name=name
+- client_reference=reference
 - client_contact_lastname=greg
 - client_email=g@tfs.im	
 - client_phonenumber=012345789
-- client_address=address from API
-- client_address_more=address more from API
-- client_zipcode=zipcode from API	
-- client_city=city from API
-- client_country=country from API
+- client_address=address
+- client_address_more=address more
+- client_zipcode=zipcode	
+- client_city=city
+- client_country=country
 - client_lang=fr
 - number_siret=0123456
 - number_tva=987654
 - client_website=http://tfs.im
 - client_keyword=agency
-- description=description from API
+- description=description
 
 JSON RESULT
 ```json
@@ -604,7 +652,7 @@ JSON RESULT
 }
 ```
 
-# 11. Récupérer les infos d'un service à partir de son id
+# 12. Récupérer les infos d'un service à partir de son id
 
 ## Paramètres en entrée
 
@@ -653,7 +701,7 @@ JSON RESULT
 }
 ```
     
-# 12. Créer un service
+# 13. Créer un service
 
 ## Paramètres en entrée
 
@@ -704,7 +752,7 @@ JSON RESULT
 }
 ```
 
-# 13. Créer une facture
+# 14. Créer une facture
 
 ## Paramètres en entrée
 
@@ -713,6 +761,7 @@ JSON RESULT
 - invoice_attention
 - objet
 - invoice_date
+- vat_enable (0 / 1)
 - invoice_vat
 - payment_condition_enable
 - payment_amount
@@ -786,7 +835,7 @@ JSON RESULT
 
 Lien vers la facture : https://app.factomos.com/i5u5pHLyBI4pizucVdo6
 
-# 14. Récupérer une facture à partir de son id
+# 15. Récupérer une facture à partir de son id
 
 ## Paramètres en entrée
 
@@ -921,7 +970,196 @@ JSON RESULT
 }
 ```
 
-# 15. Editer une facture
+
+# 16. Récupérer la liste des factures à partir de leur statut
+
+Permet de récupérer une liste de facture au maximum 50 (avec un index de pagination).
+
+Voici la liste des statuts disponibles :
+
+ - 'avoir' : facture d'avoir,
+ - 'later' : facture en retard de règlement,
+ - 'paid' : facture réglée entièrement,
+ - 'paid-avoir' : facture soldée entièrement par un avoir,
+ - 'partially-paid' : facture réglée en partie,
+ - 'partially-paid-avoir' : facture soldée en partie par un avoir,
+ - 'pending' : facture en attente de réglement
+
+## Paramètres en entrée
+
+- action=listInvoice, (OBLIGATOIRE)
+- invoice_status=<invoice_id>, (OBLIGATOIRE)
+- page_index=<page_index>, (OPTIONNEL)
+
+## Paramètres en sortie
+
+- Des infos sur la pagination dans l'objet 'pagination'
+- Un tableau des factures 
+
+## Code d'erreurs
+
+Code d'erreur | Message d'erreur                          | Description
+------------: | :---------------------------------------- | :----------------
+0             |                                           | Pas d'erreur, la requête s'est bien passée
+-1            | Missing Token                             | Le Champ "token" est manquant, or il est obligatoire
+-2            | Missing Crypted Request                   | Le Champ "crequest" est manquant, or il est obligatoire
+-3            | Invalid Token                             | Le Token est invalide, il n'existe pas dans la base Factomos
+-4            | Too many API calls for the day            | Vous avez dépassé le nombre maximum d'appels API pour la journée (par défaut limité à 500)
+-5            | Invalid Crypted Request                   | La requête n'a pas pu être décryptée, le champ crequest est invalide
+-6            | Action not found or invalid               | Le Champ "action" est manquant, or il est obligatoire
+-39           | Missing parameter invoice_status          | Le Champ "invoice_status" est manquant, or il est obligatoire
+-40           | Invalid parameter invoice_status          | Le Champ "invoice_status" est invalide, il doit correspondre à une des valeurs suivantes : 'avoir', 'later', 'paid', 'paid-avoir', 'partially-paid', 'partially-paid-avoir', 'pending'
+-41           | Invalid parameter page_index              | Le Champ "page_index" est invalide, il ne doit pas être suppérieur au nombre total de factures
+
+## Exemple
+
+POST REQUEST
+- action=listInvoice
+- invoice_status=later
+- page_index=50
+
+JSON RESULT
+```json
+{
+    "pagination":{
+        "first_row":"50",
+        "last_row":53,
+        "total_invoices":54
+    },
+        "invoices":[
+        {
+            "invoice_formated_number":"F06150193",
+            "client_id":"76577",
+            "articleList":[
+            ],
+            "invoice_status":"later",
+            "document_key":false,
+            "document_title":"Facture",
+            "estimate_id":"0",
+            "exists":true,
+            "payment_amount_total":"0",
+            "id":"154735",
+            "invoice_type":"invoice",
+            "invoice_formated_year":"2015",
+            "client_company_name":"Bob",
+            "invoice_paid_mention":"pay_before",
+            "is_exported":"1",
+            "is_recurring":"0",
+            "figures_total_withoutvat":"-150",
+            "figures_total_vat":"-30",
+            "figures_total_withvat":"-180",
+            "figures_paid":"0",
+            "figures_due":"-180",
+            "downpayment_percent":"0",
+            "downpayment_amount":"0",
+            "downpayment_paid_mention":"paid",
+            "downpayment_term":null,
+            "invoice_tags":"",
+            "unix_timestamp":"1434664800",
+            "payment_term_fr":"19\/07\/15"
+        },
+        {
+            "invoice_formated_number":"F06150191",
+            "client_id":"53037",
+            "articleList":[
+            ],
+            "invoice_status":"later",
+            "document_key":false,
+            "document_title":"Facture",
+            "estimate_id":"0",
+            "exists":true,
+            "payment_amount_total":"0",
+            "id":"154718",
+            "invoice_type":"invoice",
+            "invoice_formated_year":"2015",
+            "client_company_name":"Atelier du Sourcil",
+            "invoice_paid_mention":"pay_before",
+            "is_exported":"1",
+            "is_recurring":"0",
+            "figures_total_withoutvat":"18.43",
+            "figures_total_vat":"3.69",
+            "figures_total_withvat":"22.12",
+            "figures_paid":"0",
+            "figures_due":"22.12",
+            "downpayment_percent":"0",
+            "downpayment_amount":"0",
+            "downpayment_paid_mention":"paid",
+            "downpayment_term":null,
+            "invoice_tags":"",
+            "unix_timestamp":"1434664800",
+            "payment_term_fr":"19\/07\/15"
+        },
+        {
+            "invoice_formated_number":"F06150189",
+            "client_id":"4458",
+            "articleList":[
+            ],
+            "invoice_status":"later",
+            "document_key":false,
+            "document_title":"Facture",
+            "estimate_id":"0",
+            "exists":true,
+            "payment_amount_total":"0",
+            "id":"154714",
+            "invoice_type":"invoice",
+            "invoice_formated_year":"2015",
+            "client_company_name":"Pampy",
+            "invoice_paid_mention":"pay_before",
+            "is_exported":"1",
+            "is_recurring":"0",
+            "figures_total_withoutvat":"400",
+            "figures_total_vat":"80",
+            "figures_total_withvat":"480",
+            "figures_paid":"0",
+            "figures_due":"480",
+            "downpayment_percent":"0",
+            "downpayment_amount":"0",
+            "downpayment_paid_mention":"paid",
+            "downpayment_term":null,
+            "invoice_tags":"",
+            "unix_timestamp":"1434664800",
+            "payment_term_fr":"19\/07\/15"
+        },
+        {
+            "invoice_formated_number":"F06150187",
+            "client_id":"6230",
+            "articleList":[
+            ],
+            "invoice_status":"later",
+            "document_key":false,
+            "document_title":"FACTURE D'ACOMPTE",
+            "estimate_id":"41091",
+            "exists":true,
+            "payment_amount_total":"0",
+            "id":"154251",
+            "invoice_type":"down-payment",
+            "invoice_formated_year":"2015",
+            "client_company_name":"FMI",
+            "invoice_paid_mention":"pay_before",
+            "is_exported":"1",
+            "is_recurring":"0",
+            "figures_total_withoutvat":"416.67",
+            "figures_total_vat":"83.33",
+            "figures_total_withvat":"500",
+            "figures_paid":"0",
+            "figures_due":"500",
+            "downpayment_percent":"0",
+            "downpayment_amount":"0",
+            "downpayment_paid_mention":"paid",
+            "downpayment_term":null,
+            "invoice_tags":"",
+            "unix_timestamp":"1434492000",
+            "payment_term_fr":"17\/07\/15"
+        }
+    ],
+    "error":{
+    "code":0,
+    "message":"OK"
+    }
+}
+```
+
+# 17. Editer une facture
 
 ## Paramètres en entrée
 
@@ -998,7 +1236,7 @@ JSON RESULT
 }
 ```
 
-# 16. Envoyer une facture
+# 18. Envoyer une facture
 
 ## Paramètres en entrée
 
@@ -1039,7 +1277,85 @@ JSON RESULT
 }
 ```
 
-# 17. Créer un règlement
+# 19. Récupérer l'historique des emails d'une facture
+
+## Paramètres en entrée
+
+- action=getInvoiceMailHistory, (OBLIGATOIRE)
+- invoice_id=<invoice_id>, (OBLIGATOIRE)
+
+## Code d'erreurs
+
+Code d'erreur | Message d'erreur                          | Description
+------------: | :---------------------------------------- | :----------------
+0             |                                           | Pas d'erreur, la requête s'est bien passée
+-1            | Missing Token                             | Le Champ "token" est manquant, or il est obligatoire
+-2            | Missing Crypted Request                   | Le Champ "crequest" est manquant, or il est obligatoire
+-3            | Invalid Token                             | Le Token est invalide, il n'existe pas dans la base Factomos
+-4            | Too many API calls for the day            | Vous avez dépassé le nombre maximum d'appels API pour la journée (par défaut limité à 500)
+-5            | Invalid Crypted Request                   | La requête n'a pas pu être décryptée, le champ crequest est invalide
+-6            | Action not found or invalid               | Le Champ "action" est manquant, or il est obligatoire
+-17           | Missing parameter invoice_id              | Le Champ "invoice_id" est manquant, or il est obligatoire
+-20           | Invoice not found                         | La facture avec cet id n'existe pas dans la base Factomos
+
+## Exemple
+
+POST REQUEST
+- action=getInvoiceMailHistory
+- invoice_id=999
+
+JSON RESULT
+```json
+{
+    "invoice-emails":[
+        {"id":"77","invoice_id":"555","template_type":"reminder3","email_to":"mail@example.com","email_subject":"my subject","email_content":"my content","email_date":"2015-11-02 12:49:31","email_attachment":"","email_viewed":"0"},
+        {"id":"88","invoice_id":"555","template_type":"reminder3","email_to":"mail@example.com","email_subject":"my subject2","email_content":"my content 2","email_date":"2015-11-02 12:49:31","email_attachment":"","email_viewed":"0"}
+    ],
+    "error":{
+        "code":0,
+        "message":"OK"
+    }
+}
+```
+
+# 20. Récupérer la liste des modèles de mails
+
+## Paramètres en entrée
+
+- action=listEmailTemplates, (OBLIGATOIRE)
+
+## Code d'erreurs
+
+Code d'erreur | Message d'erreur                          | Description
+------------: | :---------------------------------------- | :----------------
+0             |                                           | Pas d'erreur, la requête s'est bien passée
+-1            | Missing Token                             | Le Champ "token" est manquant, or il est obligatoire
+-2            | Missing Crypted Request                   | Le Champ "crequest" est manquant, or il est obligatoire
+-3            | Invalid Token                             | Le Token est invalide, il n'existe pas dans la base Factomos
+-4            | Too many API calls for the day            | Vous avez dépassé le nombre maximum d'appels API pour la journée (par défaut limité à 500)
+-5            | Invalid Crypted Request                   | La requête n'a pas pu être décryptée, le champ crequest est invalide
+-6            | Action not found or invalid               | Le Champ "action" est manquant, or il est obligatoire
+
+## Exemple
+
+POST REQUEST
+- action=listEmailTemplates
+
+JSON RESULT
+```json
+{
+    "email-templates":[
+        {"id":"333","company_id":"550","signature_id":"444","template_name":"Envoi devis","template_type":"estimate","template_subject":"xcvxvvxc","template_message":"sdfsfsdf","template_attachment_doc":"0"}
+        {"id":"335","company_id":"550","signature_id":"445","template_name":"Envoi facture","template_type":"invoice","template_subject":"xcvxvvxc","template_message":"sdfsfsdf","template_attachment_doc":"0"},
+    ],
+    "error":{
+        "code":0,
+        "message":"OK"
+    }
+}
+```
+
+# 21. Créer un règlement
 
 ## Paramètres en entrée
 
@@ -1052,7 +1368,7 @@ JSON RESULT
 - numero_remise
 - numero_cheque
 
-# 18. Editer un règlement
+# 22. Editer un règlement
 
 ## Paramètres en entrée
 
@@ -1081,7 +1397,7 @@ Code d'erreur | Message d'erreur                                                
 -20           | Invoice not found                                                           | La facture avec cet id n'existe pas dans la base Factomos
 -21           | Several payments for this invoice, you have to add the parameter payment_id | Vous devez ajouter le champ "payment_id" car il y a plusieurs règlements pour cette facture
 
-# 19. Supprimer tous les règlements d'une facture
+# 23. Supprimer tous les règlements d'une facture
 
 ## Paramètres en entrée
 
@@ -1103,7 +1419,7 @@ Code d'erreur | Message d'erreur                          | Description
 -17           | Missing parameter invoice_id              | Le Champ "invoice_id" est manquant, or il est obligatoire
 -20           | Invoice not found                         | La facture avec cet id n'existe pas dans la base Factomos
 
-# 20. Créer une dépense
+# 24. Créer une dépense
 
 ## Paramètres en entrée
 
@@ -1160,7 +1476,7 @@ JSON RESULT
 }
 ```
 
-# 21. Editer une dépense
+# 25. Editer une dépense
 
 ## Paramètres en entrée
 
@@ -1223,7 +1539,7 @@ JSON RESULT
 ```
 
 
-# 22. Récupérer une dépense
+# 26. Récupérer une dépense
 
 ## Paramètres en entrée
 
@@ -1273,7 +1589,7 @@ JSON RESULT
 }
 ```
 
-# 23. Récupérer un devis à partir de son id
+# 27. Récupérer un devis à partir de son id
 
 ## Paramètres en entrée
 
@@ -1375,7 +1691,7 @@ JSON RESULT
 }
 ```
 
-# 24. Créer un devis
+# 28 Créer un devis
 
 ## Paramètres en entrée
 
@@ -1448,7 +1764,7 @@ JSON RESULT
 
 Lien vers le devis : https://app.factomos.com/e5u5pHLyBI4pizucVdo6
 
-# 25. Créer une facture à partir d'un devis
+# 29. Créer une facture à partir d'un devis
 
 ## Paramètres en entrée
 
@@ -1474,6 +1790,48 @@ Code d'erreur | Message d'erreur                          | Description
 POST REQUEST
 - action=transformEstimate
 - estimate_id=67
+
+JSON RESULT
+```json
+{
+    "invoice_id":"5782",
+    "invoice_formated_number":"F1465",
+    "invoice_document_key":"i5u5pHLyBI4pizucVdo6",
+    "invoice_date":"2012-05-01",
+    "client_id":"19",
+    "error":{
+        "code":0,
+        "message":"OK"
+    }
+}
+```
+
+# 30. Créer un avoir à partir d'une facture
+
+## Paramètres en entrée
+
+- action=createCreditNote, (OBLIGATOIRE)
+- invoice_id=<invoice_id>, (OBLIGATOIRE)
+
+## Code d'erreurs
+
+Code d'erreur | Message d'erreur                          | Description
+------------: | :---------------------------------------- | :----------------
+0             |                                           | Pas d'erreur, la requête s'est bien passée
+-1            | Missing Token                             | Le Champ "token" est manquant, or il est obligatoire
+-2            | Missing Crypted Request                   | Le Champ "crequest" est manquant, or il est obligatoire
+-3            | Invalid Token                             | Le Token est invalide, il n'existe pas dans la base Factomos
+-4            | Too many API calls for the day            | Vous avez dépassé le nombre maximum d'appels API pour la journée (par défaut limité à 500)
+-5            | Invalid Crypted Request                   | La requête n'a pas pu être décryptée, le champ crequest est invalide
+-6            | Action not found or invalid               | Le Champ "action" est manquant, or il est obligatoire
+-17           | Missing parameter invoice_id              | Le Champ "invoice_id" est manquant, or il est obligatoire
+-20           | Invoice not found                         | La facture avec cet id n'existe pas dans la base Factomos
+
+## Exemple
+
+POST REQUEST
+- action=createCreditNote
+- invoice_id=67
 
 JSON RESULT
 ```json
