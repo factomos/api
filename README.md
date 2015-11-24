@@ -1,4 +1,4 @@
-API Factomos V1.27 - 24/11/2015
+API Factomos V1.28 - 24/11/2015
 ===============================
 
 # 1. Introduction
@@ -767,7 +767,7 @@ JSON RESULT
 - payment_amount
 - payment_term
 - invoice_comment
-- line_service_id[] (value 75 for TITLES), (OBLIGATOIRE)
+- line_service_id[], (value 75 for TITLES), (OBLIGATOIRE)
 - line_description[],
 - line_quantity[], (OBLIGATOIRE)
 - line_price[],
