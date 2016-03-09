@@ -1,4 +1,4 @@
-API Factomos V1.30 - 16/12/2015
+API Factomos V1.31 - 09/03/2016
 ===============================
 
 # 1. Introduction
@@ -502,7 +502,6 @@ Voici un exemple de POST lors de la création d'un devis.
 }
 ```
 
-
 # 9. Afficher un formulaire de création de devis (au sein de factomos.com) pré-rempli
 
 Faire un POST vers la page https://app.factomos.com/creer-devis avec les paramètres suivants :
@@ -514,7 +513,100 @@ Faire un POST vers la page https://app.factomos.com/creer-devis avec les paramè
 - `estimate_comment` (Champ « commentaire » du devis)
 - `custom`, un champ pour y mettre vos variables, ce dernier sera renvoyé tel quel dans la notification au webhook
 
-# 10. Récupérer les infos d'un client à partir de son id
+# 10. Récupérer la liste des clients
+
+## Paramètres en entrée
+ - action=listClient, (OBLIGATOIRE)
+ - search_keyword=listClient, mot clé à chercher parmi la liste des clients
+ 
+## Code d'erreurs
+
+Code d'erreur | Message d'erreur                          | Description
+------------: | :---------------------------------------- | :----------------
+0             |                                           | Pas d'erreur, la requête s'est bien passée
+-1            | Missing Token                             | Le Champ "token" est manquant, or il est obligatoire
+-2            | Missing Crypted Request                   | Le Champ "crequest" est manquant, or il est obligatoire
+-3            | Invalid Token                             | Le Token est invalide, il n'existe pas dans la base Factomos
+-4            | Too many API calls for the day            | Vous avez dépassé le nombre maximum d'appels API pour la journée (par défaut limité à 500)
+-5            | Invalid Crypted Request                   | La requête n'a pas pu être décryptée, le champ crequest est invalide
+-6            | Action not found or invalid               | Le Champ "action" est manquant, or il est obligatoire
+
+## Exemple
+
+POST REQUEST
+- action=listClient
+
+JSON RESULT
+```json
+{
+    "clients": [
+        {
+            "client_id":"86577",
+            "exists":true,
+            "company_id":"550",
+            "client_company_name":"World Company",
+            "client_business_category":"",
+            "client_reference":"REF-WC",
+            "description":"",
+            "client_address":"1 infinite loop",
+            "client_address_more":"",
+            "client_zipcode":"75017",
+            "client_city":"Paris",
+            "client_country":"France",
+            "number_tva":"",
+            "number_siret":"",
+            "client_website":"",
+            "client_email":"ad@a.com",
+            "client_contact_firstname":"John",
+            "client_contact_lastname":"Doe",
+            "client_phonenumber":"",
+            "client_contact_title":"",
+            "category":"client",
+            "client_other":"",
+            "client_lang":"",
+            "client_keyword":"",
+            "client_code_analytic":"41132XX1"
+            ,"archived":"0",
+            "accountancy_code_type":"standard"
+        },
+        {
+            "client_id":"86577",
+            "exists":true,
+            "company_id":"550",
+            "client_company_name":"Mini Company",
+            "client_business_category":"",
+            "client_reference":"REF-MD",
+            "description":"",
+            "client_address":"5 finite loop",
+            "client_address_more":"",
+            "client_zipcode":"75017",
+            "client_city":"Paris",
+            "client_country":"France",
+            "number_tva":"",
+            "number_siret":"",
+            "client_website":"",
+            "client_email":"ad@a.com",
+            "client_contact_firstname":"Jane",
+            "client_contact_lastname":"Doe",
+            "client_phonenumber":"",
+            "client_contact_title":"",
+            "category":"client",
+            "client_other":"",
+            "client_lang":"",
+            "client_keyword":"",
+            "client_code_analytic":"41132XX1",
+            "archived":"0",
+            "accountancy_code_type":"standard"
+        }
+    ],
+    "error": {
+        "code":0,
+        "message":"OK"
+    }
+}
+```
+
+# 11. Récupérer les infos d'un client à partir de son id
 
 ## Paramètres en entrée
  - action=getClient, (OBLIGATOIRE)
@@ -578,7 +670,7 @@ JSON RESULT
     
 
 
-# 11. Créer un client
+# 12. Créer un client
 
 ## Paramètres en entrée
 
@@ -652,7 +744,7 @@ JSON RESULT
 }
 ```
 
-# 12. Editer un client
+# 13. Editer un client
 
 ## Paramètres en entrée
 
@@ -723,8 +815,78 @@ JSON RESULT
 }
 ```
 
+# 14. Récupérer la liste des services
 
-# 13. Récupérer les infos d'un service à partir de son id
+## Paramètres en entrée
+
+- action=listService, (OBLIGATOIRE)
+
+## Code d'erreurs
+
+Code d'erreur | Message d'erreur                          | Description
+------------: | :---------------------------------------- | :----------------
+0             |                                           | Pas d'erreur, la requête s'est bien passée
+-1            | Missing Token                             | Le Champ "token" est manquant, or il est obligatoire
+-2            | Missing Crypted Request                   | Le Champ "crequest" est manquant, or il est obligatoire
+-3            | Invalid Token                             | Le Token est invalide, il n'existe pas dans la base Factomos
+-4            | Too many API calls for the day            | Vous avez dépassé le nombre maximum d'appels API pour la journée (par défaut limité à 500)
+-5            | Invalid Crypted Request                   | La requête n'a pas pu être décryptée, le champ crequest est invalide
+-6            | Action not found or invalid               | Le Champ "action" est manquant, or il est obligatoire
+
+## Exemple
+
+POST REQUEST
+- action=listService
+
+JSON RESULT
+```json
+{
+    "services": [
+        {
+            "service_id":"104997",
+            "company_id":"550",
+            "category":"services",
+            "service_name":"Développement Web",
+            "description":"",
+            "unit":"jour",
+            "price":"800",
+            "supplier_price":"0",
+            "is_with_vat":"0",
+            "vat":"20",
+            "service_code_analytic":"706180",
+            "archived":"0",
+            "stock":"0",
+            "image":"",
+            "reference":"",
+            "accountancy_code_type":"standard"
+        },
+        {
+            "service_id":"101117",
+            "company_id":"550",
+            "category":"services",
+            "service_name":"Design",
+            "description":"",
+            "unit":"",
+            "price":"800",
+            "supplier_price":"0",
+            "is_with_vat":"0",
+            "vat":"20",
+            "service_code_analytic":"706176",
+            "archived":"0",
+            "stock":"0",
+            "image":"",
+            "reference":"",
+            "accountancy_code_type":"standard"
+        }
+    ],
+    "error": {
+        "code":0,
+        "message":"OK"
+    }
+}
+```
+
+# 15. Récupérer les infos d'un service à partir de son id
 
 ## Paramètres en entrée
 
@@ -773,7 +935,7 @@ JSON RESULT
 }
 ```
     
-# 14. Créer un service
+# 16. Créer un service
 
 ## Paramètres en entrée
 
@@ -824,7 +986,7 @@ JSON RESULT
 }
 ```
 
-# 15. Créer une facture
+# 17. Créer une facture
 
 ## Paramètres en entrée
 
@@ -908,7 +1070,7 @@ JSON RESULT
 
 Lien vers la facture : https://app.factomos.com/i5u5pHLyBI4pizucVdo6
 
-# 16. Récupérer une facture à partir de son id
+# 18. Récupérer une facture à partir de son id
 
 ## Paramètres en entrée
 
@@ -1044,7 +1206,7 @@ JSON RESULT
 ```
 
 
-# 17. Récupérer la liste des factures à partir de leur statut
+# 19. Récupérer la liste des factures à partir de leur statut
 
 Permet de récupérer une liste de facture au maximum 50 (avec un index de pagination).
 
@@ -1232,7 +1394,7 @@ JSON RESULT
 }
 ```
 
-# 18. Editer une facture
+# 20. Editer une facture
 
 ## Paramètres en entrée
 
@@ -1309,7 +1471,7 @@ JSON RESULT
 }
 ```
 
-# 19. Envoyer une facture
+# 21. Envoyer une facture
 
 ## Paramètres en entrée
 
@@ -1350,7 +1512,7 @@ JSON RESULT
 }
 ```
 
-# 20. Récupérer l'historique des emails d'une facture
+# 22. Récupérer l'historique des emails d'une facture
 
 ## Paramètres en entrée
 
@@ -1391,7 +1553,7 @@ JSON RESULT
 }
 ```
 
-# 21. Récupérer la liste des modèles de mails
+# 23. Récupérer la liste des modèles de mails
 
 ## Paramètres en entrée
 
@@ -1428,7 +1590,7 @@ JSON RESULT
 }
 ```
 
-# 22. Créer un règlement
+# 24. Créer un règlement
 
 ## Paramètres en entrée
 
@@ -1441,7 +1603,7 @@ JSON RESULT
 - numero_remise
 - numero_cheque
 
-# 23. Editer un règlement
+# 25. Editer un règlement
 
 ## Paramètres en entrée
 
@@ -1470,7 +1632,7 @@ Code d'erreur | Message d'erreur                                                
 -20           | Invoice not found                                                           | La facture avec cet id n'existe pas dans la base Factomos
 -21           | Several payments for this invoice, you have to add the parameter payment_id | Vous devez ajouter le champ "payment_id" car il y a plusieurs règlements pour cette facture
 
-# 24. Supprimer tous les règlements d'une facture
+# 26. Supprimer tous les règlements d'une facture
 
 ## Paramètres en entrée
 
@@ -1492,7 +1654,7 @@ Code d'erreur | Message d'erreur                          | Description
 -17           | Missing parameter invoice_id              | Le Champ "invoice_id" est manquant, or il est obligatoire
 -20           | Invoice not found                         | La facture avec cet id n'existe pas dans la base Factomos
 
-# 25. Créer une dépense
+# 27. Créer une dépense
 
 ## Paramètres en entrée
 
@@ -1549,7 +1711,7 @@ JSON RESULT
 }
 ```
 
-# 26. Editer une dépense
+# 28. Editer une dépense
 
 ## Paramètres en entrée
 
@@ -1612,7 +1774,7 @@ JSON RESULT
 ```
 
 
-# 27. Récupérer une dépense
+# 29. Récupérer une dépense
 
 ## Paramètres en entrée
 
@@ -1662,7 +1824,7 @@ JSON RESULT
 }
 ```
 
-# 28. Récupérer un devis à partir de son id
+# 30. Récupérer un devis à partir de son id
 
 ## Paramètres en entrée
 
@@ -1764,7 +1926,7 @@ JSON RESULT
 }
 ```
 
-# 29. Créer un devis
+# 31. Créer un devis
 
 ## Paramètres en entrée
 
@@ -1837,7 +1999,7 @@ JSON RESULT
 
 Lien vers le devis : https://app.factomos.com/e5u5pHLyBI4pizucVdo6
 
-# 30. Créer une facture à partir d'un devis
+# 32. Créer une facture à partir d'un devis
 
 ## Paramètres en entrée
 
@@ -1879,7 +2041,7 @@ JSON RESULT
 }
 ```
 
-# 31. Créer un avoir à partir d'une facture
+# 33. Créer un avoir à partir d'une facture
 
 ## Paramètres en entrée
 
