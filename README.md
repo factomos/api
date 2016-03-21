@@ -1,4 +1,4 @@
-API Factomos V1.32 - 16/03/2016
+API Factomos V1.33 - 21/03/2016
 ===============================
 
 # 1. Introduction
@@ -422,6 +422,7 @@ JSON RESULT
         "code":0
     },
     "credentials":{
+        "company_id":4654,
         "api_key":"dfIEarBFFT51jG9c1qmf",
         "api_secret":"46lg1NsxjEHCmzrc"
     }
