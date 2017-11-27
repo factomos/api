@@ -1,4 +1,4 @@
-API Factomos V1.33 - 21/03/2016
+API Factomos V1.34 - 27/11/2017
 ===============================
 
 # 1. Introduction
@@ -2129,6 +2129,40 @@ JSON RESULT
     "invoice_document_key":"i5u5pHLyBI4pizucVdo6",
     "invoice_date":"2012-05-01",
     "client_id":"19",
+    "error":{
+        "code":0,
+        "message":"OK"
+    }
+}
+```
+
+# 36. Récupérer l'URL du logo de l'entreprise
+
+## Paramètres en entrée
+
+- action=getLogo, (OBLIGATOIRE)
+
+## Code d'erreurs
+
+Code d'erreur | Message d'erreur                          | Description
+------------: | :---------------------------------------- | :----------------
+0             |                                           | Pas d'erreur, la requête s'est bien passée
+-1            | Missing Token                             | Le Champ "token" est manquant, or il est obligatoire
+-2            | Missing Crypted Request                   | Le Champ "crequest" est manquant, or il est obligatoire
+-3            | Invalid Token                             | Le Token est invalide, il n'existe pas dans la base Factomos
+-4            | Too many API calls for the day            | Vous avez dépassé le nombre maximum d'appels API pour la journée (par défaut limité à 500)
+-5            | Invalid Crypted Request                   | La requête n'a pas pu être décryptée, le champ crequest est invalide
+-6            | Action not found or invalid               | Le Champ "action" est manquant, or il est obligatoire
+
+## Exemple
+
+POST REQUEST
+- action=getLogo
+
+JSON RESULT
+```json
+{
+    "url": "https://app.factomos.com/files/company_documents/3184/logo_full.jpg",
     "error":{
         "code":0,
         "message":"OK"
