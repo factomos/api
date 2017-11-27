@@ -2162,7 +2162,7 @@ POST REQUEST
 JSON RESULT
 ```json
 {
-    "url": "https://app.factomos.com/files/company_documents/3184/logo_full.jpg",
+    "url": "https://app.factomos.com/files/company_documents/3184/logo_full.png",
     "error":{
         "code":0,
         "message":"OK"
